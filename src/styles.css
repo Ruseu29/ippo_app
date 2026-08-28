@@ -1,0 +1,44 @@
+:root {
+  font-family: Inter, "Noto Sans JP", system-ui, sans-serif;
+  color: #f7f7f8;
+  background: #111318;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button { font: inherit; }
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.panel {
+  width: min(720px, 100%);
+  padding: 32px;
+  border: 1px solid #30343d;
+  border-radius: 20px;
+  background: #1a1d24;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
+}
+
+.eyebrow { margin: 0 0 8px; color: #8fd6b5; font-weight: 700; }
+h1 { margin: 0; font-size: clamp(28px, 6vw, 48px); }
+.description { margin: 8px 0 32px; color: #aeb4c0; }
+.label { display: block; margin-bottom: 10px; color: #aeb4c0; }
+.prompt { margin: 0 0 20px; color: #8b919d; font-size: clamp(22px, 4vw, 34px); }
+
+.actions { display: flex; gap: 12px; margin-top: 24px; }
+
+button {
+  padding: 11px 16px;
+  color: #111318;
+  border: 0;
+  border-radius: 10px;
+  background: #8fd6b5;
+  cursor: pointer;
+}
+
+button.secondary { color: #f7f7f8; background: #30343d; }

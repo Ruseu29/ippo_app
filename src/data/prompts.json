@@ -1,0 +1,46 @@
+[
+  {
+    "id": "first-step",
+    "title": "最初の一歩",
+    "text": "今日は新しい一歩を踏み出す。",
+    "reading": "きょうはあたらしいいっぽをふみだす",
+    "baseScore": 100,
+    "segments": [
+      { "text": "今日", "reading": "きょう" },
+      { "text": "は", "reading": "は" },
+      { "text": "新しい", "reading": "あたらしい" },
+      { "text": "一歩", "reading": "いっぽ" },
+      { "text": "を", "reading": "を" },
+      { "text": "踏み出す", "reading": "ふみだす" }
+    ]
+  },
+  {
+    "id": "small-steps",
+    "title": "積み重ね",
+    "text": "小さな積み重ねが力になる。",
+    "reading": "ちいさなつみかさねがちからになる",
+    "baseScore": 120,
+    "segments": [
+      { "text": "小さな", "reading": "ちいさな" },
+      { "text": "積み重ね", "reading": "つみかさね" },
+      { "text": "が", "reading": "が" },
+      { "text": "力", "reading": "ちから" },
+      { "text": "に", "reading": "に" },
+      { "text": "なる", "reading": "なる" }
+    ]
+  },
+  {
+    "id": "calm-typing",
+    "title": "正確な入力",
+    "text": "落ち着いて正確に入力しよう。",
+    "reading": "おちついてせいかくににゅうりょくしよう",
+    "baseScore": 140,
+    "segments": [
+      { "text": "落ち着いて", "reading": "おちついて" },
+      { "text": "正確", "reading": "せいかく" },
+      { "text": "に", "reading": "に" },
+      { "text": "入力", "reading": "にゅうりょく" },
+      { "text": "しよう", "reading": "しよう" }
+    ]
+  }
+]
