@@ -3,6 +3,7 @@ import ResultView from "./components/ResultView";
 import TypingArea from "./components/TypingArea";
 import prompts from "./data/prompts.json";
 import { createInputLog } from "./logic/logger";
+import { sendInputLogs } from "./logic/supabase";
 import type { InputLog } from "./types";
 
 export default function App() {
@@ -12,12 +13,24 @@ export default function App() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [inputLogs, setInputLogs] = useState<InputLog[]>([]);
   const [showLogs, setShowLogs] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState("");
+  // Stateの描画更新を待たず、最後のキーまで送信へ渡すための保持場所。
+  const latestLogs = useRef<InputLog[]>([]);
+  const submissionStarted = useRef(false);
   const previousPerf = useRef<number | null>(null);
+  const sessionId = useRef<string | null>(null);
 
   const recordKey = useCallback((key: string) => {
-    const { log, rawPerf } = createInputLog(key, previousPerf.current);
+    if (submissionStarted.current) return;
+    const { log, rawPerf } = createInputLog(
+      key,
+      previousPerf.current,
+      sessionId.current,
+    );
     previousPerf.current = rawPerf;
-    setInputLogs((current) => [...current, log]);
+    latestLogs.current = [...latestLogs.current, log];
+    setInputLogs(latestLogs.current);
   }, []);
 
   // 現在表示する問題
@@ -29,16 +42,45 @@ export default function App() {
     );
   }, []);
 
+  const startGame = useCallback(() => {
+    sessionId.current = crypto.randomUUID();
+    setIsPlaying(true);
+  }, []);
+
   const resetGame = useCallback(() => {
     setIsPlaying(false);
     setIsFinished(false);
     setQuestionIndex(0);
     setInputLogs([]);
+    latestLogs.current = [];
+    submissionStarted.current = false;
+    setIsSending(false);
+    setSendError("");
     setShowLogs(false);
     previousPerf.current = null;
+    sessionId.current = null;
   }, []);
 
-  const showResult = useCallback(() => setIsFinished(true), []);
+  const showResult = useCallback(async () => {
+    if (submissionStarted.current) return;
+    submissionStarted.current = true;
+    setIsSending(true);
+    setSendError("");
+
+    try {
+      await sendInputLogs(latestLogs.current);
+      setIsFinished(true);
+    } catch (error) {
+      submissionStarted.current = false;
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : String(error);
+      setSendError(`送信に失敗しました：${message}`);
+    } finally {
+      setIsSending(false);
+    }
+  }, []);
 
   return (
     <main className="app">
@@ -50,7 +92,7 @@ export default function App() {
           <>
             <p className="description">準備ができたらプレイを開始してください。</p>
             <div className="actions">
-              <button type="button" onClick={() => setIsPlaying(true)}>プレイ開始</button>
+              <button type="button" onClick={startGame}>プレイ開始</button>
               <button className="secondary" type="button">直近のリプレイ</button>
             </div>
           </>
@@ -66,12 +108,16 @@ export default function App() {
             prompt={currentPrompt}
             questionNumber={questionIndex + 1}
             totalQuestions={prompts.length}
+            isSending={isSending}
             onNext={goToNextQuestion}
             onResult={showResult}
             onReset={resetGame}
             onKeyLog={recordKey}
           />
         )}
+
+        {isSending && <p role="status">送信中です。完了までお待ちください。</p>}
+        {sendError && <p role="alert">{sendError}</p>}
 
         <button type="button" onClick={() => setShowLogs((open) => !open)}>
           {showLogs ? "ログを閉じる" : "ログを見る"}

@@ -1,5 +1,6 @@
 export type InputLog = {
   version: "1.0";
+  session_id: string | null;
   user_id: string | null;
   device_id: string | null;
   permission: "web_test";

@@ -15,6 +15,7 @@ type TypingAreaProps = {
   prompt: Prompt;
   questionNumber: number;
   totalQuestions: number;
+  isSending: boolean;
   onNext: () => void;
   onResult: () => void;
   onReset: () => void;
@@ -25,6 +26,7 @@ export default function TypingArea({
   prompt,
   questionNumber,
   totalQuestions,
+  isSending,
   onNext,
   onResult,
   onReset,
@@ -42,6 +44,11 @@ export default function TypingArea({
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
+      // 送信中は入力・問題移動・リセットを止める。
+      if (isSending) {
+        if (["Enter", " ", "Backspace"].includes(event.key)) event.preventDefault();
+        return;
+      }
       const loggedKey =
         event.key === " "
           ? "Space"
@@ -76,7 +83,7 @@ export default function TypingArea({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isComplete, isLastQuestion, onKeyLog, onNext, onReset, onResult]);
+  }, [isSending, isComplete, isLastQuestion, onKeyLog, onNext, onReset, onResult]);
 
   return (
     <>
@@ -104,7 +111,7 @@ export default function TypingArea({
         <button
           type="button"
           onClick={isLastQuestion ? onResult : onNext}
-          disabled={!isComplete}
+          disabled={!isComplete || isSending}
         >
           {isLastQuestion ? "判定する" : "次の問題"}
         </button>
