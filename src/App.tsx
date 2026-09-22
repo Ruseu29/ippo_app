@@ -10,7 +10,8 @@ export default function App() {
   // Appが覚えておく状態
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [questionIndex, setQuestionIndex] = useState(0);
+  const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
+  const [sentenceIndex, setSentenceIndex] = useState(0);
   const [inputLogs, setInputLogs] = useState<InputLog[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -34,13 +35,14 @@ export default function App() {
   }, []);
 
   // 現在表示する問題
-  const currentPrompt = prompts[questionIndex];
+  const currentPrompt = prompts[selectedPromptIndex];
+  const currentSentence = currentPrompt.segments[sentenceIndex];
 
   const goToNextQuestion = useCallback(() => {
-    setQuestionIndex((index) =>
-      index + 1 < prompts.length ? index + 1 : index,
-    );
-  }, []);
+    if (sentenceIndex + 1 < currentPrompt.segments.length) {
+      setSentenceIndex((index) => index + 1);
+    }
+  }, [sentenceIndex, currentPrompt]);
 
   const startGame = useCallback(() => {
     sessionId.current = crypto.randomUUID();
@@ -50,7 +52,7 @@ export default function App() {
   const resetGame = useCallback(() => {
     setIsPlaying(false);
     setIsFinished(false);
-    setQuestionIndex(0);
+    setSentenceIndex(0);
     setInputLogs([]);
     latestLogs.current = [];
     submissionStarted.current = false;
@@ -95,19 +97,34 @@ export default function App() {
               <button type="button" onClick={startGame}>プレイ開始</button>
               <button className="secondary" type="button">直近のリプレイ</button>
             </div>
+            <div className="prompt-selection">
+              <label className="label" htmlFor="prompt-select">選択した文章</label>
+              <select
+                id="prompt-select"
+                value={selectedPromptIndex}
+                onChange={(event) => setSelectedPromptIndex(Number(event.target.value))}
+              >
+                {prompts.map((prompt, index) => (
+                  <option key={prompt.id} value={index}>{prompt.title}</option>
+                ))}
+              </select>
+              <p>{currentPrompt.segments.length}文 · {currentPrompt.text.length}文字</p>
+            </div>
           </>
         ) : isFinished ? (
           <ResultView
-            totalQuestions={prompts.length}
+            totalQuestions={1}
             inputLogs={inputLogs}
             onReset={resetGame}
           />
         ) : (
           <TypingArea
-            key={currentPrompt.id}
-            prompt={currentPrompt}
-            questionNumber={questionIndex + 1}
-            totalQuestions={prompts.length}
+            key={`${currentPrompt.id}-${sentenceIndex}`}
+            prompt={{ title: currentPrompt.title, ...currentSentence }}
+            questionNumber={1}
+            totalQuestions={1}
+            sentenceNumber={sentenceIndex + 1}
+            totalSentences={currentPrompt.segments.length}
             isSending={isSending}
             onNext={goToNextQuestion}
             onResult={showResult}

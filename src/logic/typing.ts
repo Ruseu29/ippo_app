@@ -1,7 +1,11 @@
 import { toKana } from "wanakana";
 import romajiMap from "../data/romaji-map.json";
 
-const mapping: Record<string, string> = romajiMap;
+const mapping: Record<string, string> = { ...romajiMap, ",": "、", ".": "。" };
+// 促音の ppo / tte など、エンジンが受け付ける入力も候補に含める。
+const inputCandidates = Object.keys(mapping).flatMap((input) =>
+  /^[bcdfghjklmpqrstvwxyz]/.test(input) ? [input, input[0] + input] : [input],
+);
 
 // 生入力を、平仮名＋まだ変換できないアルファベットへ変換する。
 export function convertTypingInput(rawInput: string): string {
@@ -9,6 +13,39 @@ export function convertTypingInput(rawInput: string): string {
     IMEMode: true,
     customKanaMapping: mapping,
   });
+}
+
+// 未完成の s / sh なども、正解へ続けられるなら間違いにしない。
+function canContinue(rawInput: string, reading: string): boolean {
+  const converted = convertTypingInput(rawInput);
+  if (reading.startsWith(converted)) return true;
+
+  const pending = converted.match(/[a-z]+$/)?.[0];
+  if (!pending) return false;
+
+  return inputCandidates.some((input) =>
+    input.startsWith(pending) &&
+    reading.startsWith(convertTypingInput(rawInput + input.slice(pending.length))),
+  );
+}
+
+// 最初に正解から外れたキーと、変換結果の不一致位置を返す。
+export function findTypingError(rawInput: string, reading: string) {
+  const converted = convertTypingInput(rawInput);
+  if (canContinue(rawInput, reading)) {
+    return { rawIndex: rawInput.length, kanaIndex: converted.length };
+  }
+
+  let rawIndex = 0;
+  while (rawIndex < rawInput.length && canContinue(rawInput.slice(0, rawIndex + 1), reading)) {
+    rawIndex += 1;
+  }
+
+  let kanaIndex = 0;
+  while (kanaIndex < converted.length && converted[kanaIndex] === reading[kanaIndex]) {
+    kanaIndex += 1;
+  }
+  return { rawIndex, kanaIndex };
 }
 
 // 平仮名から、対応表で最初に見つかった入力を取得する。
