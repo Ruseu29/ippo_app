@@ -30,8 +30,9 @@ h1 { margin: 0; font-size: clamp(28px, 6vw, 48px); }
 .label { display: block; margin-bottom: 10px; color: #aeb4c0; }
 .prompt { margin: 0 0 20px; color: #8b919d; font-size: clamp(22px, 4vw, 34px); }
 .typing-error { color: #ff7979; }
+.typing-injected { color: #73b7ff; }
 
-.actions { display: flex; gap: 12px; margin-top: 24px; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
 
 button {
   padding: 11px 16px;
@@ -43,6 +44,21 @@ button {
 }
 
 button.secondary { color: #f7f7f8; background: #30343d; }
+button:disabled { cursor: wait; opacity: 0.55; }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid #8fd6b5; outline-offset: 4px;
+}
+pre { overflow: auto; max-height: 360px; padding: 12px; background: #111318; }
+.history-meta { color: #aeb4c0; margin: 16px 0; }
+.replay-list { list-style: none; padding: 0; display: grid; gap: 10px; }
+.replay-item { width: 100%; text-align: left; display: grid; gap: 8px; }
+.replay-item span { color: #c2c7d1; font-size: 0.85rem; }
+.replay-controls { margin-top: 24px; }
+.replay-controls input { display: block; width: 100%; margin-top: 12px; accent-color: #8fd6b5; }
+.replay-controls select { padding: 8px; font: inherit; color: #f7f7f8; background: #30343d; border-radius: 8px; }
+.replay-log, .sync-notice { margin-top: 24px; overflow-wrap: anywhere; }
+.replay-log summary { cursor: pointer; }
+@media (max-width: 480px) { .app { padding: 12px; } .panel { padding: 20px; } }
 
 .prompt-selection { margin: 24px 0; }
 .prompt-selection p { margin: 8px 0 0; color: #aeb4c0; }

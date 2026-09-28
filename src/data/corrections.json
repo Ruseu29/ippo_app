@@ -1,1 +1,6 @@
-[]
+{
+  "deus": {
+    "to": "desu",
+    "inputs": ["Backspace", "Backspace", "s", "u"]
+  }
+}

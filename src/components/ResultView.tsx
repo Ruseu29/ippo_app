@@ -1,3 +1,4 @@
+import { isPlayEvent } from "../logic/logger";
 import type { InputLog } from "../types";
 
 type ResultViewProps = {
@@ -11,13 +12,15 @@ export default function ResultView({
   inputLogs,
   onReset,
 }: ResultViewProps) {
-  const backspaceCount = inputLogs.filter(
+  const keyLogs = inputLogs.filter((log) => !log.is_injected && !isPlayEvent(log.event_key));
+  const backspaceCount = keyLogs.filter(
     (log) => log.event_key === "Backspace",
   ).length;
 
-  const intervals = inputLogs
-    .map((log) => log.delta_ms)
-    .filter((delta): delta is number => delta !== null)
+  // 進行イベントを挟んでも、実際のキー同士の間隔で集計する。
+  const intervals = keyLogs
+    .slice(1)
+    .map((log, index) => Math.round((log.perf - keyLogs[index].perf) * 10) / 10)
     .sort((a, b) => a - b);
 
   const averageInterval = intervals.length
@@ -36,7 +39,7 @@ export default function ResultView({
       <span className="label">RESULT</span>
       <p className="prompt">全{totalQuestions}問を完了しました。</p>
 
-      <p className="description">打った回数：{inputLogs.length}回</p>
+      <p className="description">打った回数：{keyLogs.length}回</p>
       <p className="description">Backspace：{backspaceCount}回</p>
       <p className="description">平均スピード：{averageSpeed.toFixed(2)}打鍵/秒</p>
       <p className="description">入力間隔の中央値：{medianInterval.toFixed(1)}ms</p>

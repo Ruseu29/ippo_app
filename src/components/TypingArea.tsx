@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
-import { toRomaji } from "wanakana";
-import {
-  convertTypingInput,
-  deleteLastCharacter,
-  findTypingError,
-} from "../logic/typing";
+import { useEffect } from "react";
+import TypingDisplay from "./TypingDisplay";
+import type { CorrectionMatch } from "../logic/autocorrect";
+import { convertTypingInput } from "../logic/typing";
+import { useTypingInput } from "../logic/useTypingInput";
 
 type Prompt = {
   title: string;
@@ -19,10 +17,13 @@ type TypingAreaProps = {
   sentenceNumber: number;
   totalSentences: number;
   isSending: boolean;
+  isCompleted: boolean;
+  autocorrectEnabled: boolean;
   onNext: () => void;
   onResult: () => void;
   onReset: () => void;
-  onKeyLog: (key: string) => void;
+  onKeyLog: (key: string, isInjected?: boolean) => void;
+  onCorrectionMatch: (match: CorrectionMatch) => void;
 };
 
 export default function TypingArea({
@@ -32,25 +33,18 @@ export default function TypingArea({
   sentenceNumber,
   totalSentences,
   isSending,
+  isCompleted,
+  autocorrectEnabled,
   onNext,
   onResult,
   onReset,
   onKeyLog,
+  onCorrectionMatch,
 }: TypingAreaProps) {
-  // 実際に押されたアルファベットを保存する。
-  const [rawInput, setRawInput] = useState("");
-  const [showReading, setShowReading] = useState(false);
-
-  // rawInputが変わるたびに、画面へ出す文字を作る。
-  const convertedText = convertTypingInput(rawInput);
-  // 「んの」「っち」も変換表と合うローマ字で案内する。
-  const exampleRomaji = toRomaji(prompt.reading, {
-    customRomajiMapping: { ん: "nn", "っち": "tti" },
+  const { rawInput, injectedRaw, inputKey, correctionError } = useTypingInput({
+    autocorrectEnabled, onKeyLog, onCorrectionMatch,
   });
-  const { rawIndex, kanaIndex } = findTypingError(rawInput, prompt.reading);
-  // 入力は全文を保持し、画面だけ末尾12文字に絞る。
-  const kanaStart = Math.max(0, convertedText.length - 12);
-  const rawStart = Math.max(0, rawInput.length - 12);
+  const convertedText = convertTypingInput(rawInput);
 
   const isLastSentence = sentenceNumber === totalSentences;
   const isLastQuestion = questionNumber === totalQuestions && isLastSentence;
@@ -84,65 +78,33 @@ export default function TypingArea({
         return;
       }
 
+      // 終了確定後は、送信の再試行とタイトルに戻る操作だけ許可する。
+      if (isCompleted) {
+        if (event.key === "Backspace") event.preventDefault();
+        return;
+      }
+
       if (event.key === "Backspace") {
         event.preventDefault();
-        setRawInput((current) => deleteLastCharacter(current));
+        inputKey("Backspace");
         return;
       }
 
       if (/^[a-zA-Z,.'-]$/.test(event.key)) {
         event.preventDefault();
-        setRawInput((current) => current + event.key.toLowerCase());
+        inputKey(event.key);
       }
     }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSending, isComplete, isLastQuestion, onKeyLog, onNext, onReset, onResult]);
+  }, [isSending, isCompleted, isComplete, isLastQuestion, inputKey, onKeyLog, onNext, onReset, onResult]);
 
   return (
     <>
-      <p className="description">
-        {sentenceNumber}/{totalSentences}
-      </p>
-      <span className="label">{prompt.title}</span>
-      <p className="prompt">{prompt.text}</p>
-      <button
-        type="button"
-        aria-expanded={showReading}
-        onClick={() => setShowReading((open) => !open)}
-      >
-        {showReading ? "読みを閉じる" : "読みを見る"}
-      </button>
-      {showReading && (
-        <>
-          <p className="description">{prompt.reading}</p>
-          <span className="label">模範のローマ字</span>
-          <p className="description">{exampleRomaji}</p>
-        </>
-      )}
-
-      <span className="label">WanaKanaの変換結果</span>
-      <p className="prompt">
-        {convertedText ? <>
-          {kanaStart > 0 && "…"}
-          {convertedText.slice(kanaStart, kanaIndex)}
-          <span className="typing-error">{convertedText.slice(Math.max(kanaStart, kanaIndex))}</span>
-        </> : "（まだ入力されていません）"}
-      </p>
-
-      <span className="label">現在の生入力（ローマ字）</span>
-      <p className="description">
-        {rawInput ? <>
-          {rawStart > 0 && "…"}
-          {rawInput.slice(rawStart, rawIndex)}
-          <span className="typing-error">{rawInput.slice(Math.max(rawStart, rawIndex))}</span>
-        </> : "（まだ入力されていません）"}
-      </p>
-
-      <p className="description">
-        {isComplete ? "出題文の読みに一致しました。" : "入力中です。"}
-      </p>
+      <TypingDisplay prompt={prompt} rawInput={rawInput} injectedRaw={injectedRaw}
+        sentenceNumber={sentenceNumber} totalSentences={totalSentences} />
+      {correctionError && <p role="alert">{correctionError}</p>}
 
       <div className="actions">
         <button

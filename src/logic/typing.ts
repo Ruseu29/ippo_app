@@ -1,4 +1,4 @@
-import { toKana } from "wanakana";
+import { toKana, toRomaji } from "wanakana";
 import romajiMap from "../data/romaji-map.json";
 
 const mapping: Record<string, string> = { ...romajiMap, ",": "、", ".": "。" };
@@ -6,6 +6,16 @@ const mapping: Record<string, string> = { ...romajiMap, ",": "、", ".": "。" }
 const inputCandidates = Object.keys(mapping).flatMap((input) =>
   /^[bcdfghjklmpqrstvwxyz]/.test(input) ? [input, input[0] + input] : [input],
 );
+
+// 表示用のローマ字も、入力エンジンで同じ読みに戻せる綴りにする。
+export function getExampleRomaji(reading: string): string {
+  return toRomaji(reading, {
+    customRomajiMapping: {
+      ん: "nn", ぢ: "di", づ: "du",
+      "っち": "tti", "っちゃ": "ttya", "っちゅ": "ttyu", "っちょ": "ttyo",
+    },
+  });
+}
 
 // 生入力を、平仮名＋まだ変換できないアルファベットへ変換する。
 export function convertTypingInput(rawInput: string): string {
