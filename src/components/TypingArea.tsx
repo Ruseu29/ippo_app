@@ -90,7 +90,7 @@ export default function TypingArea({
         return;
       }
 
-      if (/^[a-zA-Z,.'-]$/.test(event.key)) {
+      if (/^[a-zA-Z,.'?-]$/.test(event.key)) {
         event.preventDefault();
         inputKey(event.key);
       }
