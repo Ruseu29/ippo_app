@@ -95,6 +95,10 @@ RLSは有効のまま。既存INSERTポリシーと書き込み権限は維持�
 
 ## ローカル検証
 
+Windowsの共有フォルダでは[専用の起動方法](local-environment.md)を使い、
+`start-ippo.bat test` / `start-ippo.bat build` / `start-ippo.bat ui-test` を実行する。
+以下のpnpm直接実行は、共有フォルダ以外の通常環境向け。
+
 `pnpm test`：操作順、長いプレイの全件取得、版番号の維持、一括保存、再送、RLS、旧端末データの移行。
 DBテストはPGlite内だけで実行し、実Supabaseへ接続しない。`pnpm build`：型とビルド。
 
