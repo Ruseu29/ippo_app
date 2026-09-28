@@ -54,7 +54,7 @@ test("促音と後続の子音を区別し、削除による生入力の再構�
 test("自動修正の操作数や間隔を結果の手入力集計に混ぜない", () => {
   const record = samplePlay(30, ["d", "e", "u", "s", "Backspace", "Backspace", "s", "u", "Finish"]);
   for (let i = 4; i < 8; i++) record.logs[i] = { ...record.logs[i], is_injected: true, delta_ms: null };
-  const markup = renderToStaticMarkup(createElement(ResultView, { totalQuestions: 1, inputLogs: record.logs, onReset() {} }));
+  const markup = renderToStaticMarkup(createElement(ResultView, { totalQuestions: 1, inputLogs: record.logs, onReset() {}, onRetry() {} }));
   assert.match(markup, /打った回数：4回/);
   assert.match(markup, /Backspace：0回/);
   assert.match(markup, /入力間隔の中央値：100.0ms/);

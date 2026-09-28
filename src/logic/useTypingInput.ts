@@ -1,15 +1,16 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { createAutocorrectMonitor, prepareCorrection, type CorrectionMatch } from "./autocorrect";
+import { createAutocorrectMonitor, prepareCorrection, type CorrectionDictionary, type CorrectionMatch } from "./autocorrect";
 import { applyTypingKey, emptyTypingState, isTypingKey } from "./typingState";
 
 type Options = {
   autocorrectEnabled: boolean;
+  correctionDictionary?: CorrectionDictionary;
   onKeyLog: (key: string, isInjected?: boolean) => void;
   onCorrectionMatch: (match: CorrectionMatch) => void;
 };
 
 // 画面は実打鍵を記録した後に inputKey を呼ぶ。修正操作の反映・記録はここで完結する。
-export function useTypingInput({ autocorrectEnabled, onKeyLog, onCorrectionMatch }: Options) {
+export function useTypingInput({ autocorrectEnabled, correctionDictionary, onKeyLog, onCorrectionMatch }: Options) {
   const [input, setInput] = useState(emptyTypingState);
   const latestInput = useRef(emptyTypingState());
   const [correctionError, setCorrectionError] = useState("");
@@ -26,7 +27,7 @@ export function useTypingInput({ autocorrectEnabled, onKeyLog, onCorrectionMatch
       latestInput.current = step.state;
       onKeyLog(step.key, true);
     }
-  }), [onCorrectionMatch, onKeyLog]);
+  }, correctionDictionary), [onCorrectionMatch, onKeyLog, correctionDictionary]);
 
   const inputKey = useCallback((key: string) => {
     if (!isTypingKey(key)) return;

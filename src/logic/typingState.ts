@@ -2,7 +2,7 @@ import { convertTypingInput, deleteLastCharacter } from "./typing";
 
 export type TypingState = { rawInput: string; injectedRaw: boolean[] };
 export const emptyTypingState = (): TypingState => ({ rawInput: "", injectedRaw: [] });
-export const isTypingKey = (key: string): boolean => key === "Backspace" || /^[a-zA-Z,.'?-]$/.test(key);
+export const isTypingKey = (key: string): boolean => key === "Backspace" || /^[a-zA-Z,.'?=-]$/.test(key);
 
 function commonPrefix(a: string, b: string): number {
   let index = 0;

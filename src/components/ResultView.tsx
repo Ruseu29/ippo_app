@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { isPlayEvent } from "../logic/logger";
 import type { InputLog } from "../types";
 
@@ -5,13 +6,21 @@ type ResultViewProps = {
   totalQuestions: number;
   inputLogs: InputLog[];
   onReset: () => void;
+  onRetry: () => void;
 };
 
 export default function ResultView({
   totalQuestions,
   inputLogs,
   onReset,
+  onRetry,
 }: ResultViewProps) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") onReset(); };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onReset]);
+
   const keyLogs = inputLogs.filter((log) => !log.is_injected && !isPlayEvent(log.event_key));
   const backspaceCount = keyLogs.filter(
     (log) => log.event_key === "Backspace",
@@ -45,6 +54,7 @@ export default function ResultView({
       <p className="description">入力間隔の中央値：{medianInterval.toFixed(1)}ms</p>
 
       <div className="actions">
+        <button type="button" onClick={onRetry}>もう1回する</button>
         <button type="button" onClick={onReset}>
           タイトルに戻る
         </button>

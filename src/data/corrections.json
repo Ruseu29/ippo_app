@@ -2,5 +2,117 @@
   "deus": {
     "to": "desu",
     "inputs": ["Backspace", "Backspace", "s", "u"]
+  },
+  "madehta": {
+    "to": "madehat",
+    "inputs": ["Backspace", "a", "t"]
+  },
+  "sawagaini": {
+    "to": "sawagini",
+    "inputs": ["Backspace", "Backspace", "Backspace", "g", "i", "n", "i"]
+  },
+  "hennnna": {
+    "to": "hennna",
+    "inputs": ["Backspace", "Backspace", "n", "a"]
+  },
+  "nnasagwa": {
+    "to": "nnasawa",
+    "inputs": ["Backspace", "Backspace", "w", "a"]
+  },
+  "sawaganin": {
+    "to": "sawaginin",
+    "inputs": ["Backspace", "Backspace", "Backspace", "g", "i", "n", "i", "n"]
+  },
+  "esyoua": {
+    "to": "esyouk",
+    "inputs": ["Backspace", "k"]
+  },
+  "nnasaga": {
+    "to": "nnasawa",
+    "inputs": ["Backspace", "w", "a"]
+  },
+  "sawagag": {
+    "to": "sawagin",
+    "inputs": ["Backspace", "Backspace", "g", "i", "n"]
+  },
+  "wagina": {
+    "to": "wagini",
+    "inputs": ["Backspace", "n", "i"]
+  },
+  "diui": {
+    "to": "doui",
+    "inputs": ["Backspace", "Backspace", "Backspace", "d", "o", "u", "i"]
+  },
+  "ichoude": {
+    "to": "ichoutt",
+    "inputs": ["Backspace", "t", "t"]
+  },
+  "issekni": {
+    "to": "issekin",
+    "inputs": ["Backspace", "i", "n"]
+  },
+  "issekoini": {
+    "to": "issekini",
+    "inputs": ["Backspace", "Backspace", "Backspace", "k", "i", "n", "i"]
+  },
+  "sekinocho": {
+    "to": "sekinicho",
+    "inputs": ["Backspace", "Backspace", "Backspace", "n", "i", "c", "h", "o"]
+  },
+  "ssekiini": {
+    "to": "ssekini",
+    "inputs": ["Backspace", "Backspace", "n", "i"]
+  },
+  "ssekimnc": {
+    "to": "ssekinic",
+    "inputs": ["Backspace", "Backspace", "Backspace", "n", "i", "c"]
+  },
+  "uiuii=": {
+    "to": "uiuiim",
+    "inputs": ["Backspace", "m"]
+  },
+  "uttedid": {
+    "to": "uttedou",
+    "inputs": ["Backspace", "Backspace", "d", "o", "u"]
+  },
+  "uttediu": {
+    "to": "uttedou",
+    "inputs": ["Backspace", "Backspace", "d", "o", "u"]
+  },
+  "aginiat": {
+    "to": "agininat",
+    "inputs": ["Backspace", "Backspace", "n", "a", "t"]
+  },
+  "asawanigini": {
+    "to": "asawagini",
+    "inputs": ["Backspace", "Backspace", "Backspace", "g", "i", "n", "i"]
+  },
+  "dehattaihe": {
+    "to": "dehataihe",
+    "inputs": ["Backspace", "Backspace", "Backspace", "Backspace", "t", "a", "i", "h", "e"]
+  },
+  "hennnsa": {
+    "to": "hennnas",
+    "inputs": ["Backspace", "Backspace", "n", "a", "s"]
+  },
+  "ihenna": {
+    "to": "ihennn",
+    "inputs": ["Backspace", "n"]
+  },
+  "ininatte": {
+    "to": "ininalts",
+    "inputs": ["Backspace", "Backspace", "l", "t", "s"]
+  },
+  "ninatatsou": {
+    "to": "ninattasou",
+    "inputs": ["Backspace", "Backspace", "Backspace", "Backspace", "t", "t", "a", "s", "o", "u"]
+  },
+  "uyama": {
+    "to": "yama",
+    "inputs": ["Backspace", "Backspace", "Backspace", "y", "a", "m", "a"]
+  },
+  "ya,ma": {
+    "to": "yama",
+    "inputs": ["Backspace", "Backspace", "m", "a"]
   }
 }

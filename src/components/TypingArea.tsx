@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import TypingDisplay from "./TypingDisplay";
-import type { CorrectionMatch } from "../logic/autocorrect";
+import type { CorrectionDictionary, CorrectionMatch } from "../logic/autocorrect";
 import { convertTypingInput } from "../logic/typing";
 import { useTypingInput } from "../logic/useTypingInput";
 
@@ -19,6 +19,7 @@ type TypingAreaProps = {
   isSending: boolean;
   isCompleted: boolean;
   autocorrectEnabled: boolean;
+  correctionDictionary: CorrectionDictionary;
   onNext: () => void;
   onResult: () => void;
   onReset: () => void;
@@ -35,6 +36,7 @@ export default function TypingArea({
   isSending,
   isCompleted,
   autocorrectEnabled,
+  correctionDictionary,
   onNext,
   onResult,
   onReset,
@@ -42,7 +44,7 @@ export default function TypingArea({
   onCorrectionMatch,
 }: TypingAreaProps) {
   const { rawInput, injectedRaw, inputKey, correctionError } = useTypingInput({
-    autocorrectEnabled, onKeyLog, onCorrectionMatch,
+    autocorrectEnabled, correctionDictionary, onKeyLog, onCorrectionMatch,
   });
   const convertedText = convertTypingInput(rawInput);
 
@@ -90,7 +92,7 @@ export default function TypingArea({
         return;
       }
 
-      if (/^[a-zA-Z,.'?-]$/.test(event.key)) {
+      if (/^[a-zA-Z,.'?=-]$/.test(event.key)) {
         event.preventDefault();
         inputKey(event.key);
       }

@@ -6,6 +6,7 @@ export type CorrectionRule = {
   // 左から順に実行するキー操作。Backspace は表示上の末尾1文字の削除。
   inputs: readonly string[];
 };
+export type CorrectionDictionary = Readonly<Record<string, CorrectionRule>>;
 
 export type CorrectionMatch = CorrectionRule & {
   from: string;
@@ -19,7 +20,7 @@ export type CorrectionMatch = CorrectionRule & {
 // 一致したら置換開始の受け口へ渡す。入力の書き換えはここでは行わない。
 export function createAutocorrectMonitor(
   onMatch: (match: CorrectionMatch) => void,
-  dictionary: Readonly<Record<string, CorrectionRule>> = corrections,
+  dictionary: CorrectionDictionary = corrections,
 ): (rawInput: string) => void {
   const rules = Object.entries(dictionary)
     .filter(([from, rule]) => from.length > 0 && from !== rule.to)

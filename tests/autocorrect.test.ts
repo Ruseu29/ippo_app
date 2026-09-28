@@ -74,6 +74,18 @@ test("辞書の入力手順が表示1文字単位の削除で修正先に到達�
   }
 });
 
+test("辞書の修正前は実入力として受け付けられ、監視から修正先まで到達する", () => {
+  for (const [from, rule] of Object.entries(corrections)) {
+    let state = emptyTypingState();
+    for (const key of from) state = applyTypingKey(state, key);
+    assert.equal(state.rawInput, from, `受け付けられない入力：${from}`);
+    const matches: CorrectionMatch[] = [];
+    createAutocorrectMonitor(match => matches.push(match))(state.rawInput);
+    assert.equal(matches[0]?.from, from);
+    assert.equal(prepareCorrection(state, matches[0])?.at(-1)?.state.rawInput, rule.to);
+  }
+});
+
 test("deus の修正は、でうs → でう → で → でs → です の順に進む", () => {
   let rawInput = "deus";
   const displayed = [convertTypingInput(rawInput)];

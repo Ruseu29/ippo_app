@@ -1,13 +1,15 @@
 import { useCallback, useRef, useState } from "react";
 import ResultView from "./components/ResultView";
+import CorrectionEditor from "./components/CorrectionEditor";
 import TypingArea from "./components/TypingArea";
 import ReplayHistory from "./components/ReplayHistory";
 import ReplayView from "./components/ReplayView";
 import { promptGroups } from "./data/prompts";
+import defaultCorrections from "./data/corrections.json";
 import { createInputLog, isPlayEvent, PLAY_EVENTS } from "./logic/logger";
 import { createReplayRecord } from "./logic/replay";
 import { useReplayHistory } from "./logic/useReplayHistory";
-import type { CorrectionMatch } from "./logic/autocorrect";
+import type { CorrectionDictionary, CorrectionMatch } from "./logic/autocorrect";
 import type { InputLog, ReplayRecord } from "./types";
 
 type CorrectionLog = CorrectionMatch & Pick<InputLog,
@@ -24,6 +26,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [autocorrectEnabled, setAutocorrectEnabled] = useState(false);
+  const [correctionDictionary, setCorrectionDictionary] = useState<CorrectionDictionary>(defaultCorrections);
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(0);
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);
   const [sentenceIndex, setSentenceIndex] = useState(0);
@@ -182,12 +185,16 @@ export default function App() {
               </select>
               <p>{currentPrompt.segments.length}文 · {currentPrompt.text.length}文字</p>
             </div>
+            <CorrectionEditor dictionary={correctionDictionary} onApply={dictionary => {
+              setCorrectionDictionary(dictionary); setAutocorrectEnabled(true);
+            }} />
           </>
         ) : isFinished ? (
           <ResultView
             totalQuestions={1}
             inputLogs={inputLogs}
             onReset={resetGame}
+            onRetry={() => { resetGame(); startGame(); }}
           />
         ) : (
           <TypingArea
@@ -200,6 +207,7 @@ export default function App() {
             isSending={isSending}
             isCompleted={completedLogs.current !== null}
             autocorrectEnabled={autocorrectEnabled}
+            correctionDictionary={correctionDictionary}
             onNext={goToNextQuestion}
             onResult={showResult}
             onReset={resetGame}
