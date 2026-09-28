@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import prompts from "../data/prompts";
 import type { InputLog, ReplayRecord } from "../types";
 import { createReplayRecord, RECENT_REPLAY_LIMIT } from "./replay";
-import { isSupportedLogVersion } from "./logger";
+import { getDeviceId, isSupportedLogVersion } from "./logger";
 
 // 公開してよい接続情報だけを置く。アクセス制限は Supabase 側の RLS で設定する。
 export const supabaseConfig = {
@@ -35,9 +35,11 @@ export function createReplayApi(client: SupabaseClient, promptIds: string[]) {
 
     async fetchRecentReplays(): Promise<ReplayRecord[]> {
       if (!promptIds.length) return [];
+      const deviceId = getDeviceId();
       const signal = AbortSignal.timeout(15000);
       const { data: finishes, error } = await table().select("session_id,event_index")
         .eq("permission", "web_test").eq("event_key", "Finish").in("prompt_id", promptIds)
+        .eq("device_id", deviceId)
         .order("timestamp", { ascending: false }).order("id", { ascending: false })
         .limit(RECENT_REPLAY_LIMIT).abortSignal(signal);
       if (error) throw error;
@@ -50,7 +52,7 @@ export function createReplayApi(client: SupabaseClient, promptIds: string[]) {
         const { data, count, error: pageError } = await table().select(
           "version,session_id,prompt_id,event_index,sentence_number,user_id,device_id,permission,event_key,timestamp,perf,delta_ms,is_injected",
           { count: "exact" },
-        ).in("session_id", ids).order("session_id").order("event_index")
+        ).in("session_id", ids).eq("device_id", deviceId).order("session_id").order("event_index")
           .range(logs.length, logs.length + 999).abortSignal(signal);
         if (pageError) throw pageError;
         if (count === null || !data?.length) throw new Error("オンライン履歴の全ログを取得できませんでした。");

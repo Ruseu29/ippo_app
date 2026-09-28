@@ -1,5 +1,18 @@
 import type { InputLog } from "../types";
 
+let deviceId: string | null = null;
+export function getDeviceId(): string {
+  if (deviceId) return deviceId;
+  try {
+    deviceId = localStorage.getItem("ippo_device_id") || crypto.randomUUID();
+    localStorage.setItem("ippo_device_id", deviceId);
+  } catch {
+    // 保存できない環境でも、このページ内では同じIDを使う。
+    deviceId ??= crypto.randomUUID();
+  }
+  return deviceId;
+}
+
 // ログを作った時点の版を、端末保存・送信でも維持する。
 export const LOG_VERSION = "1.2";
 export const TEST_LOG_VERSION = "-11.0";
@@ -33,8 +46,8 @@ export function createInputLog(
     log: {
       version: position?.prompt_id === "test-1" ? TEST_LOG_VERSION : position ? LOG_VERSION : "1.0",
       session_id: sessionId,
-      user_id: null,
-      device_id: null,
+      user_id: "guest",
+      device_id: getDeviceId(),
       permission: "web_test",
       event_key: eventKey,
       is_injected: isInjected,

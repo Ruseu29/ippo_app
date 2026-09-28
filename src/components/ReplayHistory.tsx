@@ -1,5 +1,5 @@
 import type { ReplayRecord } from "../types";
-import { getReplayPrompt, RECENT_REPLAY_LIMIT } from "../logic/replay";
+import { getReplayPrompt, isCurrentDeviceReplay, RECENT_REPLAY_LIMIT } from "../logic/replay";
 import { mergeRecords, type useReplayHistory } from "../logic/useReplayHistory";
 
 type Props = {
@@ -11,17 +11,18 @@ type Props = {
 };
 
 export default function ReplayHistory({ history, onOpen, onBack, scope, onScope }: Props) {
-  const records = mergeRecords([], scope === "online" ? history.online : history.local.map(item => item.record));
+  const records = mergeRecords([], scope === "online" ? history.online : history.local.map(item => item.record))
+    .filter(isCurrentDeviceReplay);
   const pending = new Set(history.local.filter(item => item.sync_status === "pending").map(item => item.record.session_id));
   return <section aria-label="リプレイ履歴">
     <h2>直近10プレイ</h2>
     <div className="actions" role="group" aria-label="履歴の保存先">
       <button type="button" aria-pressed={scope === "online"} className={scope === "online" ? "" : "secondary"}
-        onClick={() => onScope("online")}>オンライン全体</button>
+        onClick={() => onScope("online")}>オンライン保存分</button>
       <button type="button" aria-pressed={scope === "local"} className={scope === "local" ? "" : "secondary"}
         onClick={() => onScope("local")}>この端末</button>
     </div>
-    <p className="history-meta">{scope === "online" ? "ユーザーで絞らず、保存されたプレイを表示します。" : "このブラウザで完了したプレイです。"}</p>
+    <p className="history-meta">このブラウザの端末IDに一致するプレイだけを表示します。</p>
     {history.isLoading && <p role="status">履歴を読み込んでいます。</p>}
     {scope === "online" && history.onlineError && <p role="alert">オンライン履歴を取得できませんでした。{history.onlineError}</p>}
     {!history.isLoading && records.length === 0 && !(scope === "online" && history.onlineError) &&

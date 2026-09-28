@@ -9,6 +9,7 @@ import test from "./stories/test/prompts.json";
 
 // 作品ごとのフォルダをここで登録する。配列の順番が作品・各編の表示順になる。
 export const promptGroups = [
+  { id: "test", title: "テスト", prompts: test },
   { id: "buying-mittens", title: "手袋を買いに", prompts: buyingMittens },
   { id: "ame-ni-mo-makezu", title: "雨ニモマケズ", prompts: ameNiMoMakezu },
   { id: "kumo-no-ito", title: "蜘蛛の糸", prompts: kumoNoIto },
@@ -16,7 +17,6 @@ export const promptGroups = [
   { id: "kyonen-no-ki", title: "去年の木", prompts: kyonenNoKi },
   { id: "akai-rousoku", title: "赤いろうそく", prompts: akaiRousoku },
   { id: "nobara", title: "野ばら", prompts: nobara },
-  { id: "test", title: "テスト", prompts: test },
 ];
 
 // プレイログ・リプレイは、フォルダ構成に関係なく従来の文章IDで参照する。

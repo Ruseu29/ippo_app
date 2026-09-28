@@ -1,9 +1,11 @@
 import prompts from "../data/prompts";
 import type { InputLog, ReplayRecord } from "../types";
-import { isPlayEvent, isSupportedLogVersion, LOG_VERSION, TEST_LOG_VERSION, PLAY_EVENTS } from "./logger";
+import { getDeviceId, isPlayEvent, isSupportedLogVersion, LOG_VERSION, TEST_LOG_VERSION, PLAY_EVENTS } from "./logger";
 import { applyTypingKey, emptyTypingState, isTypingKey, type TypingState } from "./typingState";
 
 export const RECENT_REPLAY_LIMIT = 10;
+export const isCurrentDeviceReplay = (record: ReplayRecord): boolean =>
+  record.logs.every(log => log.device_id === getDeviceId());
 export type ReplayPrompt = { id: string; title: string; segments: { text: string; reading: string }[] };
 export const getReplayPrompt = (record: ReplayRecord): ReplayPrompt | undefined =>
   prompts.find(prompt => prompt.id === record.prompt_id);

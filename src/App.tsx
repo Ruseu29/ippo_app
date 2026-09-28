@@ -25,7 +25,7 @@ export default function App() {
   // Appが覚えておく状態
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [autocorrectEnabled, setAutocorrectEnabled] = useState(false);
+  const [autocorrectEnabled, setAutocorrectEnabled] = useState(true);
   const [correctionDictionary, setCorrectionDictionary] = useState<CorrectionDictionary>(defaultCorrections);
   const [selectedGroupIndex, setSelectedGroupIndex] = useState(0);
   const [selectedPromptIndex, setSelectedPromptIndex] = useState(0);

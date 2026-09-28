@@ -2,6 +2,7 @@ import "fake-indexeddb/auto";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadLocalReplays, saveLocalReplay } from "../src/logic/replayStorage";
+import { isCurrentDeviceReplay } from "../src/logic/replay";
 import { samplePlay, samplePrompt } from "./fixtures";
 
 const open = (version: number) => new Promise<IDBDatabase>((resolve, reject) => {
@@ -63,4 +64,18 @@ test("端末保存・再読込でも注入フラグを保持する", async () =>
   await saveLocalReplay({ record, sync_status: "pending" });
   const loaded = await loadLocalReplays();
   assert.deepEqual(loaded.replays.find(item => item.record.session_id === record.session_id)?.record, record);
+});
+
+test("端末内もNULL・別IDを表示件数に数えず、自分の直近10件と未送信データを保持する", async () => {
+  for (let n = 50; n <= 61; n++) {
+    const record = samplePlay(n);
+    record.logs.forEach(log => { log.device_id = n % 2 ? null : "another-device"; });
+    assert.equal(isCurrentDeviceReplay(record), false);
+    await saveLocalReplay({ record, sync_status: n === 61 ? "pending" : "synced" });
+  }
+  const { replays } = await loadLocalReplays();
+  const visible = replays.filter(item => isCurrentDeviceReplay(item.record));
+  assert.equal(visible.length, 10);
+  assert.ok(visible.some(item => item.record.session_id === samplePlay(40).session_id));
+  assert.ok(replays.some(item => item.record.session_id === samplePlay(61).session_id && item.sync_status === "pending"));
 });

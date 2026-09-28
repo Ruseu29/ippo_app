@@ -1,5 +1,5 @@
 import type { InputLog, StoredReplay } from "../types";
-import { createReplayRecord, isReplayRecord, logSequenceError, RECENT_REPLAY_LIMIT } from "./replay";
+import { createReplayRecord, isCurrentDeviceReplay, isReplayRecord, logSequenceError, RECENT_REPLAY_LIMIT } from "./replay";
 
 const STORE = "plays";
 let connection: Promise<IDBDatabase> | null = null;
@@ -71,7 +71,8 @@ export async function loadLocalReplays(): Promise<{ replays: StoredReplay[]; ski
       const item = normalizeStoredReplay(value);
       if (item) {
         found.set(item.record.session_id, item);
-        return true;
+        // 再送用のデータは保持し、表示対象の端末だけで直近10件を数える。
+        return isCurrentDeviceReplay(item.record);
       }
       skipped.add(key);
       return false;

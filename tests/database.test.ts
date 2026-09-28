@@ -136,3 +136,19 @@ test("DBの既定値に依存せず1.2を保存し、移行後も旧1.1の再送
   await assert.rejects(versionApi.sendReplay(unknown), /未対応/);
   assert.equal(rest.stats.writes, writes);
 });
+
+test("端末IDで絞ってから直近10件を選び、NULL・別端末の打鍵を取得しない", async () => {
+  const promptId = "device-filter-test";
+  const deviceApi = createReplayApi(createClient("http://test.invalid", "test-key", { global: { fetch: rest.fetch } }), [promptId]);
+  const own = createReplayRecord(samplePlay(60).logs.map(log => ({ ...log, prompt_id: promptId })));
+  await deviceApi.sendReplay(own);
+  for (let n = 61; n <= 72; n++) {
+    await deviceApi.sendReplay(createReplayRecord(samplePlay(n).logs.map(log => ({
+      ...log, prompt_id: promptId, device_id: n % 2 ? null : "another-device",
+    }))));
+  }
+  assert.deepEqual(await deviceApi.fetchRecentReplays(), [own]);
+  // Finishだけでなく、全打鍵の取得にも端末条件を付ける。
+  await db.query("update play_results set device_id=null where session_id=$1 and event_index=1", [own.session_id]);
+  await assert.rejects(deviceApi.fetchRecentReplays(), /順序/);
+});
