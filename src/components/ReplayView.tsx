@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReplayRecord } from "../types";
 import { buildReplayFrames, formatReplayTime, getReplayFrame, getReplayPrompt, replayUnavailableReason } from "../logic/replay";
+import { findTypingError } from "../logic/typing";
 import ReplayControls from "./ReplayControls";
 import TypingDisplay from "./TypingDisplay";
+import InputLogDisplay from "./InputLogDisplay";
 
 export default function ReplayView({ record, onBack }: { record: ReplayRecord; onBack: () => void }) {
   const { prompt, reason, frames } = useMemo(() => {
@@ -10,8 +12,17 @@ export default function ReplayView({ record, onBack }: { record: ReplayRecord; o
     const reason = replayUnavailableReason(record, prompt);
     return { prompt, reason, frames: reason ? [] : buildReplayFrames(record, prompt) };
   }, [record]);
+  const markers = useMemo(() => {
+    let wasError = false;
+    return frames.flatMap((frame, index) => {
+      const error = !!prompt && findTypingError(frame.rawInput, prompt.segments[frame.sentenceIndex].reading).rawIndex < frame.rawInput.length;
+      const injected = record.logs[index - 1]?.is_injected === true;
+      const mark = injected ? !record.logs[index - 2]?.is_injected : error && !wasError;
+      wasError = error;
+      return mark ? [{ atMs: frame.atMs, injected }] : [];
+    });
+  }, [frames, prompt, record.logs]);
   const [showLogs, setShowLogs] = useState(false);
-  const logText = useMemo(() => showLogs ? JSON.stringify(record.logs, null, 2) : "", [record.logs, showLogs]);
   const duration = frames.at(-1)?.atMs ?? 0;
   const [atMs, setAtMs] = useState(0);
   const position = useRef(0);
@@ -47,7 +58,7 @@ export default function ReplayView({ record, onBack }: { record: ReplayRecord; o
         rawInput={frame.rawInput} injectedRaw={frame.injectedRaw} sentenceNumber={frame.sentenceIndex + 1}
         totalSentences={prompt.segments.length}
       />
-      <ReplayControls atMs={atMs} duration={duration} isPlaying={isPlaying} speed={speed}
+      <ReplayControls atMs={atMs} duration={duration} isPlaying={isPlaying} speed={speed} markers={markers}
         onSeek={seek} onSpeed={setSpeed} onToggle={() => {
           if (atMs >= duration) { position.current = 0; setAtMs(0); }
           setIsPlaying(playing => !playing);
@@ -58,7 +69,7 @@ export default function ReplayView({ record, onBack }: { record: ReplayRecord; o
       <summary>保存されたログを見る（{record.logs.length}件）</summary>
       <p>セッション：{record.session_id}</p>
       <p>文章：{record.prompt_id}（現在の問題文で再生）</p>
-      <pre>{logText}</pre>
+      {showLogs && <InputLogDisplay logs={record.logs} />}
     </details>
     <div className="actions"><button type="button" className="secondary" onClick={onBack}>履歴に戻る</button></div>
   </section>;

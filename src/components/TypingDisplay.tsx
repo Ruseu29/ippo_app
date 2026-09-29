@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 import { convertTypingInput, findTypingError, getExampleRomaji } from "../logic/typing";
 import { injectedKanaFlags } from "../logic/typingState";
 
+// 読みの補助表示を戻すときは true にする。
+const READING_HELP_ENABLED = false;
+
 type Props = {
   prompt: { title: string; text: string; reading: string };
   rawInput: string;
@@ -30,19 +33,19 @@ export default function TypingDisplay({ prompt, rawInput, injectedRaw = [], sent
     <p className="description">{sentenceNumber}/{totalSentences}</p>
     <span className="label">{prompt.title}</span>
     <p className="prompt">{prompt.text}</p>
-    <button type="button" aria-expanded={showReading} onClick={() => setShowReading(open => !open)}>
-      {showReading ? "読みを閉じる" : "読みを見る"}
-    </button>
-    {showReading && <>
-      <p className="description">{prompt.reading}</p>
-      <span className="label">模範のローマ字</span>
-      <p className="description">{exampleRomaji}</p>
+    {READING_HELP_ENABLED && <>
+      <button type="button" aria-expanded={showReading} onClick={() => setShowReading(open => !open)}>
+        {showReading ? "読みを閉じる" : "読みを見る"}
+      </button>
+      {showReading && <>
+        <p className="description">{prompt.reading}</p>
+        <span className="label">模範のローマ字</span>
+        <p className="description">{exampleRomaji}</p>
+      </>}
     </>}
-    <span className="label">WanaKanaの変換結果</span>
     <p className="prompt">{convertedText ? <>
       {kanaStart > 0 && "…"}{coloredText(convertedText, kanaStart, kanaIndex, kanaInjected)}
     </> : "（まだ入力されていません）"}</p>
-    <span className="label">現在の生入力（ローマ字）</span>
     <p className="description">{rawInput ? <>
       {rawStart > 0 && "…"}{coloredText(rawInput, rawStart, rawIndex, injectedRaw)}
     </> : "（まだ入力されていません）"}</p>

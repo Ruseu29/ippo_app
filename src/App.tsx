@@ -4,10 +4,11 @@ import CorrectionEditor from "./components/CorrectionEditor";
 import TypingArea from "./components/TypingArea";
 import ReplayHistory from "./components/ReplayHistory";
 import ReplayView from "./components/ReplayView";
+import InputLogDisplay from "./components/InputLogDisplay";
 import { promptGroups } from "./data/prompts";
 import defaultCorrections from "./data/corrections.json";
 import { createInputLog, isPlayEvent, PLAY_EVENTS } from "./logic/logger";
-import { createReplayRecord } from "./logic/replay";
+import { createReplayRecord, getReplayPrompt } from "./logic/replay";
 import { useReplayHistory } from "./logic/useReplayHistory";
 import type { CorrectionDictionary, CorrectionMatch } from "./logic/autocorrect";
 import type { InputLog, ReplayRecord } from "./types";
@@ -135,15 +136,13 @@ export default function App() {
   return (
     <main className="app">
       <section className="panel">
-        <p className="eyebrow">IPPO TYPING</p>
-        <h1>一歩ずつ、正確に。</h1>
+        {(!showHistory || replay) && <h1>{replay ? getReplayPrompt(replay)?.title ?? "リプレイ" : "ippo_app"}</h1>}
 
         {replay ? <ReplayView key={replay.session_id} record={replay} onBack={() => setReplay(null)} />
         : showHistory ? <ReplayHistory history={history} onOpen={setReplay} onBack={() => setShowHistory(false)}
           scope={historyScope} onScope={setHistoryScope} />
         : !isPlaying ? (
           <>
-            <p className="description">準備ができたらプレイを開始してください。</p>
             <div className="actions">
               <button type="button" onClick={startGame}>プレイ開始</button>
               <button className="secondary" type="button" onClick={() => setShowHistory(true)}>直近のリプレイ</button>
@@ -237,7 +236,7 @@ export default function App() {
               {showCorrectionLogs ? "監視ログを閉じる" : "監視ログを見る"}（{correctionLogs.length}件）
             </button>
           </div>
-          {showLogs && <pre id="input-logs" aria-label="入力ログ">{JSON.stringify(inputLogs, null, 2)}</pre>}
+          {showLogs && <div id="input-logs"><InputLogDisplay logs={inputLogs} /></div>}
           {showCorrectionLogs && <div id="correction-logs">
             <p>{!autocorrectEnabled ? "監視はOFFです。"
               : isFinished || completedLogs.current !== null ? "監視は終了しました。"

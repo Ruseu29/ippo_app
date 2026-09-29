@@ -28,9 +28,9 @@ export default function CorrectionEditor({ dictionary, onApply }: Props) {
 
   return (
     <details className="correction-editor replay-log">
-      <summary>修正辞書を一時編集（{isTemporary ? "臨時適用中" : "標準"}）</summary>
+      <summary>編集</summary>
       <p className="history-meta">変更はこのタブだけに適用されます。再読み込みで標準に戻るため、残したい辞書はJSONで保存してください。</p>
-      <p>適用中：{Object.keys(dictionary).length}件{isEdited && " ／ 編集内容はまだ適用されていません。"}</p>
+      <p>適用中：{Object.keys(dictionary).length}件（{isTemporary ? "臨時適用中" : "標準"}）{isEdited && " ／ 編集内容はまだ適用されていません。"}</p>
       <textarea aria-label="臨時の修正辞書JSON" rows={12} spellCheck={false} value={draft}
         onChange={event => { setDraft(event.target.value); setError(""); setStatus(""); }} />
       <div className="actions">

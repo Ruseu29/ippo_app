@@ -49,12 +49,16 @@ button:focus-visible, .download-button:focus-visible, select:focus-visible, inpu
   outline: 2px solid #8fd6b5; outline-offset: 4px;
 }
 pre { overflow: auto; max-height: 360px; padding: 12px; background: #111318; }
+.input-log-columns { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 12px; }
 .history-meta { color: #aeb4c0; margin: 16px 0; }
 .replay-list { list-style: none; padding: 0; display: grid; gap: 10px; }
 .replay-item { width: 100%; text-align: left; display: grid; gap: 8px; }
 .replay-item span { color: #c2c7d1; font-size: 0.85rem; }
 .replay-controls { margin-top: 24px; }
-.replay-controls input { display: block; width: 100%; margin-top: 12px; accent-color: #8fd6b5; }
+.replay-controls input { display: block; width: 100%; margin: 12px 0 0; accent-color: #8fd6b5; }
+.replay-markers { position: relative; height: 18px; margin: 0 8px; }
+.replay-markers span { position: absolute; top: 8px; width: 2px; height: 7px; background: currentColor; transform: translateX(-50%); }
+.replay-markers .typing-injected { top: 0; }
 .replay-controls select { padding: 8px; font: inherit; color: #f7f7f8; background: #30343d; border-radius: 8px; }
 .replay-log, .sync-notice { margin-top: 24px; overflow-wrap: anywhere; }
 .replay-log summary { cursor: pointer; }
